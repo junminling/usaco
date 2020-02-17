@@ -4,18 +4,29 @@ import java.io.*;
 import java.util.Scanner;
 
 public class WhereAmI {
+    public static boolean detectDuplicate(String origStr, String subStr){
+        int idx1 = origStr.indexOf(subStr);
+        String str2 = origStr.substring(idx1+1);
+        if(str2.indexOf(subStr) == -1)
+            return false;
+        else
+            return true;
+    }
+
     public static void main(String[] main){
         try {
-            Scanner scanner = new Scanner(new File("/Users/jling/git/personalizedpnservice-jling/personalizedpnservice/src/main/java/com/ebay/app/personalizedpn/dedupe/whereami.in"));
+            Scanner scanner = new Scanner(new File("/Users/jling/git/usaco/src/dec2019/bronze/whereami.in"));
+//            Scanner scanner = new Scanner(new File("./whereami.in"));
             int size = Integer.parseInt(scanner.nextLine().trim());
             String s = scanner.nextLine().trim();
             int[] numsOfUniquePattern = new int[26];
 
-            for(int i=0; i<s.length(); i++){
-                for(int j=1; i+j<s.length(); j++){
-                    String substr = getsubstring(s, i, j);
-                    if(!hasDupStr(s, substr)){
-                        numsOfUniquePattern[s.charAt(i)-'A']=j;
+            for(int i=0; i<size; i++){
+                for(int j=1; i+j<size; j++){
+                    String substr = i+j==s.length()?s.substring(i):s.substring(i, i+j);
+                    if(!detectDuplicate(s, substr)){
+                        int currentcount = numsOfUniquePattern[s.charAt(i) - 'A'];
+                        numsOfUniquePattern[s.charAt(i) - 'A']=Math.max(currentcount, j);
                         break;
                     }
                 }
@@ -25,31 +36,12 @@ public class WhereAmI {
             for(int i=0; i<26; i++){
                 k = Math.max(numsOfUniquePattern[i], k);
             }
-            System.out.println(k);
 
             BufferedWriter bw = new BufferedWriter(new FileWriter("./whereami.out"));
             bw.write(String.valueOf(k));
             bw.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static String getsubstring(String s, int pos, int numOfChars){
-        if(pos+numOfChars==s.length()) return s.substring(pos);
-        return s.substring(pos, pos+numOfChars);
-    }
-
-    public static boolean hasDupStr(String s, String pattern){
-        int count = 0;
-        int firstIdx = s.indexOf(pattern);
-        String substr = s.substring(firstIdx+pattern.length());
-        if(substr.indexOf(pattern) == -1)
-            return false;
-        else
-            return true;
     }
 }
